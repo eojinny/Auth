@@ -32,20 +32,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        try {
-            SignInRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), SignInRequestDto.class);
-
-            // 여기서 비밀번호 인증까지 진행함.
-            return getAuthenticationManager().authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            requestDto.getId(),
-                            requestDto.getPassword()
-                    )
-            );
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e.getMessage());
-        }
+//        try {
+//            SignInRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), SignInRequestDto.class);
+//
+//            // 여기서 비밀번호 인증까지 진행함.
+//            return getAuthenticationManager().authenticate(
+//                    new UsernamePasswordAuthenticationToken(
+//                            requestDto.getId(),
+//                            requestDto.getPassword()
+//                    )
+//            );
+//        } catch (IOException e) {
+//            log.error(e.getMessage());
+//            throw new RuntimeException(e.getMessage());
+//        }
+        return null;
     }
 
     // 로그인 성공 시

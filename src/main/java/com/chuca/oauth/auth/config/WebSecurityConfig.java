@@ -3,28 +3,24 @@ package com.chuca.oauth.auth.config;
 
 import com.chuca.oauth.auth.security.FailedAuthenticationEntryPoint;
 import com.chuca.oauth.auth.security.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.web.AuthenticationEntryPoint;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,7 +34,6 @@ import java.util.Arrays;
 public class WebSecurityConfig{
 
     private final DefaultOAuth2UserService oAuth2UserService;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 
     @Bean
@@ -62,8 +57,8 @@ public class WebSecurityConfig{
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new FailedAuthenticationEntryPoint())
-                )
-                .addFilterBefore(jwtAuthenticationFilter, beforeFilter:UsernamePasswordAuthenticationFilter.class);
+                );
+
         return httpSecurity.build();
     }
     @Bean
