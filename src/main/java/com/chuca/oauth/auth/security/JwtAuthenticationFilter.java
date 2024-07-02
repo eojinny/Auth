@@ -1,5 +1,7 @@
 package com.chuca.oauth.auth.security;
 
+import com.chuca.oauth.auth.common.ResponseCode;
+import com.chuca.oauth.auth.common.ResponseMessage;
 import com.chuca.oauth.auth.entity.User;
 import com.chuca.oauth.auth.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,8 +89,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         try {
             Map<String, Object> responseData = new HashMap<>();
-            responseData.put("code", ResponseCode.SIGN_IN_FAILED);
-            responseData.put("message", ResponseMessage.SIGN_IN_FAILED);
+            responseData.put("code", ResponseCode.SIGN_IN_FAIL);
+            responseData.put("message", ResponseMessage.SIGN_IN_FAIL);
             responseData.put("data", "로그인 실패");
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
