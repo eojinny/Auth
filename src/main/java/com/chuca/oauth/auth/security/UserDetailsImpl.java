@@ -27,7 +27,25 @@ public class UserDetailsImpl implements UserDetails {
         return userEntity.getUserId(); // 1단계
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String authority = userEntity.getRole().split("_")[1];

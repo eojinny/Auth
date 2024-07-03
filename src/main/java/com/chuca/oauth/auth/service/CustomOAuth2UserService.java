@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class KakaoService {
+public class CustomOAuth2UserService {
 }
