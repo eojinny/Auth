@@ -3,6 +3,7 @@ package com.chuca.oauth.auth.config;
 import com.chuca.oauth.auth.security.OAuth2AuthenticationSuccessHandler;
 import com.chuca.oauth.auth.security.JwtAuthenticationFilter;
 import com.chuca.oauth.auth.security.JwtTokenProvider;
+import com.chuca.oauth.auth.service.implement.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +24,10 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final DefaultOAuth2UserService oAuth2UserService;
+    //private final DefaultOAuth2UserService oAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final JwtTokenProvider jwtTokenProvider;
+    private final OAuth2UserServiceImpl oAuth2UserServiceImpl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -44,7 +46,7 @@ public class WebSecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/auth/kakao/*"))
-                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserServiceImpl))
                 )
                 .formLogin(form -> form
                         .loginPage("/")

@@ -8,6 +8,7 @@ import com.chuca.oauth.auth.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,14 @@ import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
-public class OAuth2UserServiceImplement extends DefaultOAuth2UserService {
+public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
+        OAuth2UserService oAuth2UserService = new DefaultOAuth2UserService();
+        OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
         return processOAuth2User(userRequest, oAuth2User);
     }
 
@@ -35,7 +37,7 @@ public class OAuth2UserServiceImplement extends DefaultOAuth2UserService {
         User user = userRepository.findByEmail(oAuth2UserInfo.getEmail());
         if (user != null) {
             if (!user.getSocialProvider().equals("KAKAO")) {
-                throw new RuntimeException("Email already signed up.");
+                throw new RuntimeException("Email already signed up with different provider.");
             }
             user = updateUser(user, oAuth2UserInfo);
         } else {
