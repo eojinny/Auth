@@ -1,6 +1,8 @@
 package com.chuca.oauth.auth.config;
 
-import com.chuca.oauth.auth.security.FailedAuthenticationEntryPoint;
+import com.chuca.oauth.auth.security.OAuth2AuthenticationSuccessHandler;
+import com.chuca.oauth.auth.security.JwtAuthenticationFilter;
+import com.chuca.oauth.auth.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,17 +24,20 @@ import java.util.Arrays;
 public class WebSecurityConfig {
 
     private final DefaultOAuth2UserService oAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+        http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeRequests(requests -> requests
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/login", "/oauth2/**", "/auth/kakao/**").permitAll()
+                .csrf().disable()
+                .httpBasic().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests(authorize -> authorize
+                        .requestMatchers("/", "/login", "/oauth2/**").permitAll()
+                        .requestMatchers("/auth/kakao/**").permitAll()
                         .requestMatchers("/api/v1/user/**").hasRole("USER")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -43,8 +49,13 @@ public class WebSecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/")
                         .permitAll()
-                )
-                .build();
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                );
+
+        // Add JWT filter
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     @Bean
@@ -59,5 +70,4 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }
