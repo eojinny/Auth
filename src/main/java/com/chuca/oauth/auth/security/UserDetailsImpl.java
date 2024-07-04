@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 @Getter
 public class UserDetailsImpl implements UserDetails {
@@ -24,7 +25,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userEntity.getUserId(); // 1단계
+        return userEntity.getUserId();
     }
 
     @Override
@@ -46,14 +47,28 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String authority = userEntity.getRole().split("_")[1];
-
-        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(userEntity.getRole());
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(simpleGrantedAuthority);
-
         return authorities;
+    }
+
+    public static UserDetailsImpl create(User user, Map<String, Object> attributes) {
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
+        userDetails.setAttributes(attributes);
+        return userDetails;
+    }
+
+    private Map<String, Object> attributes;
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 }

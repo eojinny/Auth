@@ -5,20 +5,30 @@ import lombok.AllArgsConstructor;
 
 import java.util.Map;
 
-@Getter
-@AllArgsConstructor
-public class KakaoOAuth2User {
 
-    private Map<String, Object> attributes;
+import java.util.Map;
 
+public class KakaoOAuth2User extends OAuth2UserInfo {
 
-    public String getEmail() {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        return kakaoAccount.get("email").toString();
+    private Integer id;
+
+    public KakaoOAuth2User(Map<String, Object> attributes) {
+        super((Map<String, Object>) attributes.get("kakao_account"));
+        this.id = (Integer) attributes.get("id");
     }
 
+    @Override
+    public String getOAuth2Id() {
+        return this.id.toString();
+    }
+
+    @Override
+    public String getEmail() {
+        return (String) attributes.get("email");
+    }
+
+    @Override
     public String getName() {
-        Map<String, Object> properties = (Map<String, Object>) attributes.get("profile");
-        return properties.get("nickname").toString();
+        return (String) ((Map<String, Object>) attributes.get("profile")).get("nickname");
     }
 }
