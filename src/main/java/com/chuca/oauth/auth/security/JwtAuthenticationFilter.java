@@ -49,8 +49,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("유효 토큰 검사 완료. 해당 유저 인가 처리 완료");
         }
 
-        // null 일때 처리: 더 들어오지 않고 내보낸다 - 일단 보류요 ..
-
         filterChain.doFilter(request, response);
 
     }

@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SignUpRequestDto {
     @NotBlank
-    private Long id;
+    private String id;
 
     @NotBlank
     @Size(min = 8, max=13, message = "비밀번호는 8~13글자이어야 합니다." )

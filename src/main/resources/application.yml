@@ -14,7 +14,7 @@ spring:
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             client-name: Kakao
-            scope: profile_nickname, profile_image
+            scope: profile_nickname, 	account_email
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
@@ -38,3 +38,9 @@ spring:
     show-sql: true
     properties:
       hibernate.format_sql: true
+jwt:
+  secretKey: secretkeysecretkeysecretkeysecretkeysecretkey
+  access:
+    expiration: 3600000
+  refresh:
+    expiration: 86400000

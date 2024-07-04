@@ -4,12 +4,10 @@ import com.chuca.oauth.auth.entity.User;
 import com.chuca.oauth.auth.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,43 +35,32 @@ public class JwtTokenProvider {
     private Long refreshTokenValidTime;
 
     private final UserRepository userRepository;
-    private final RedisTemplate<String, String> redisTemplate;
-
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-    }
 
     public String createAccessToken(Long userId, String userPk, String socialProvider) {
-
-        // JWT payload 에 저장되는 정보단위, 보통 여기서 user를 식별하는 값을 넣음
         Claims claims = Jwts.claims().setSubject(userPk);
         claims.put("id", userId);
-        claims.put("socialProvider",socialProvider);
+        claims.put("socialProvider", socialProvider);
         Date now = new Date();
         return Jwts.builder()
-                .setClaims(claims) // 정보 저장
-                .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + accessTokenValidTime)) // set Expire Time
-                .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과 signature 에 들어갈 secret값 세팅
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + accessTokenValidTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
     public String createRefreshToken(Long userId) {
-
         Date now = new Date();
         return Jwts.builder()
-                .setId(Long.toString(userId)) // 정보 저장
-                .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + refreshTokenValidTime)) // set Expire Time
-                .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과 signature 에 들어갈 secret값 세팅
+                .setId(Long.toString(userId))
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + refreshTokenValidTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
     public Authentication getAuthentication(String token) {
-        log.info("여기 토큰 userId로 던짐!!:::: " + this.getUserPk(token));
         UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token));
-        log.info("JwtTokenProvider 클래스 들어옴. getAuthentication 메서드 실행 중");
         return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 
@@ -88,25 +74,10 @@ public class JwtTokenProvider {
 
     public Optional<String> extractAccessToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader("Authorization"));
-
     }
-
 
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader("Authorization-Refresh"));
-
-    }
-
-    public void storeRefreshToken(long userId, String refreshToken) {
-        User user = userRepository.findById(String.valueOf(userId)).orElse(null);
-        if (user != null) {
-            redisTemplate.opsForValue().set(
-                    Long.toString(userId),
-                    refreshToken,
-                    refreshTokenValidTime,
-                    TimeUnit.MILLISECONDS
-            );
-        }
     }
 
     public boolean validateToken(String jwtToken) {
@@ -128,11 +99,10 @@ public class JwtTokenProvider {
         } catch (IllegalArgumentException e) {
             log.warn("JWT claims string is empty.");
         } catch (NullPointerException e) {
-            log.warn("JWT RefreshToken is empty");
+            log.warn("JWT 토큰이 비어 있습니다.");
         } catch (Exception e) {
             log.warn("잘못된 토큰입니다.");
         }
         return false;
-
     }
 }
