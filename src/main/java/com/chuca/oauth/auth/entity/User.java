@@ -7,19 +7,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity(name="user")
-@Table(name="user")
+@Table(name="member")
 public class User{
 
     @Id
     @Column(name = "user_id", nullable = false, unique = true)
-    private Long userId;
+    private String userId;
 
     private String password;
 
@@ -42,6 +44,9 @@ public class User{
         this.role = "ROLE_USER"; // 권한 일단 모두 이용자로 초기화
     }
 
+    public void update(String name){
+        this.userId=name;
+    }
     @Transactional
     public void refreshTokenReset(String refreshToken) {
         this.refreshToken = refreshToken;
